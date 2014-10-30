@@ -343,7 +343,7 @@ var XBBCODE = (function() {
       noParse: true
     },
     "quote": {
-      openTag: function(params,content) { return '<blockquote">'; },
+      openTag: function(params,content) { return '<blockquote>'; },
       closeTag: function(params,content) { return '</blockquote>'; }
     },
     "right": {
@@ -382,7 +382,7 @@ var XBBCODE = (function() {
         if (!sizePattern.test(size)) {
           size = "inherit";
         }
-        return '<span style="font-size: ' + size + ' !important; line-height: 1.3em;" >';
+        return '<span style="font-size: ' + size + ' !important; line-height: 1.3em;">';
       },
       closeTag: function(params,content) { return '</span>'; }
     },
