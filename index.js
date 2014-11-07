@@ -103,7 +103,6 @@ var XBBCODE = (function() {
    * --------------------------------------------------------------------------- */
 
   // tags to add:
-  // img parameters
   // chrissy (wtf)
   // kissy (wtf)
   // flash (not supported)
@@ -357,13 +356,61 @@ var XBBCODE = (function() {
     },
     "img": {
       openTag: function(params,content) {
+        // url
         var myUrl = content;
         myUrl = myUrl.trim();
         urlPattern.lastIndex = 0;
-        if ( !urlPattern.test( myUrl ) ) {
-            myUrl = "";
+        if ( !urlPattern.test( myUrl ) ) { myUrl = ""; }
+        if (!params) { return '<img src="' + myUrl + '" />'; }
+
+        // params
+        var options = params;
+        options = options.trim();
+        options = options.replace(/<.*?>/g,'');
+        var alt, width, height;
+        
+        // validate params counts
+        if ((options.match(/alt=/gi) || []).length > 1) {
+          return '<img src="' + myUrl + '" />';
         }
-        return '<img src="' + myUrl + '" />';
+
+        if ((options.match(/width=/gi) || []).length > 1) {
+          return '<img src="' + myUrl + '" />';
+        }
+
+        if ((options.match(/height=/gi) || []).length > 1) {
+          return '<img src="' + myUrl + '" />';
+        }
+
+        // pull out parameters through regex
+        var regexArray = /^(alt=.+?|width=[0-9]+?|height=[0-9]+?)?\s*(alt=.+?|width=[0-9]+?|height=[0-9]+?)?\s*(alt=.+?|width=[0-9]+?|height=[0-9]+?)$/i.exec(options);
+        
+        // check that array exists
+        if (regexArray) {
+          // parse author link date
+          // the regex array output is weird: 
+          // [0] = the matched output as a whole so skip that
+          for (var i = 1; i < regexArray.length; i++) {
+            var value = regexArray[i] || '';
+            value = value.trim();
+            if (/alt=/i.test(value)) {
+              alt = value.substr(4);
+            }
+            else if (/width=/i.test(value)) {
+              width = value.substr(6);
+            }
+            else if (/height=/i.test(value)) {
+              height = value.substr(7);
+            }
+          }
+        }
+
+        var tag = '<img src="' + myUrl + '" ';
+        if (alt) { tag += 'alt="' + alt + '" '; }
+        if (width) { tag += 'width="' + width + '" '; }
+        if (height) { tag += 'height="' + height + '" '; }
+        tag += '/>';
+        return tag;
       },
       closeTag: function(params,content) { return ''; },
       displayContent: false
@@ -511,16 +558,14 @@ var XBBCODE = (function() {
         var author, link, date;
 
         // validate that there is only one author, and optional link and date
-        var authorArray = /author=/i.exec(options);
-        if (!authorArray || authorArray.length > 2) {
+        var authorCount = options.match(/author=/gi) || [];
+        if (authorCount.length > 1 || authorCount.length === 0) {
           return quoteHeader + quote;
         }
-        var linkArray = /link=/i.exec(options);
-        if (linkArray && linkArray.length > 2) {
+        if ((options.match(/link=/gi) || []).length > 1) {
           return quoteHeader + quote;
         }
-        var timeArray = /date=/i.exec(options);
-        if (timeArray && timeArray.length > 2) {
+        if ((options.match(/date=/gi) || []).length > 1) {
           return quoteHeader + quote;
         }
 
