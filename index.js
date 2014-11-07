@@ -44,11 +44,14 @@ var XBBCODE = (function() {
   var me = {},
       urlPattern = /^(?:https?|file|c):(?:\/{1,3}|\\{1})[-a-zA-Z0-9:;@#%&()~_?\+=\/\\\.]*$/,
       ftpPattern = /^(?:ftps?|c):(?:\/{1,3}|\\{1})[-a-zA-Z0-9:;@#%&()~_?\+=\/\\\.]*$/,
-      colorNamePattern = /^(?:red|green|blue|orange|yellow|black|white|brown|gray|silver|purple|maroon|fushsia|lime|olive|navy|teal|aqua)$/,
+      colorNamePattern = /^(?:red|green|blue|orange|yellow|pink|black|white|beige|brown|grey|gray|silver|purple|maroon|lime|limegreen|olive|navy|teal|aqua)$/,
       colorCodePattern = /^#?[a-fA-F0-9]{6}$/,
       emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/,
       fontFacePattern = /^([a-z][a-z0-9_]+|"[a-z][a-z0-9_\s]+")$/i,
       sizePattern = /([1-9][\d]?p[xt]|(?:x-)?small(?:er)?|(?:x-)?large[r]?)/,
+      anchorPattern = /[#]?([A-Za-z][A-Za-z0-9_-]*)/,
+      smfQuotePattern = /(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\.\/]{1,40}(?:;start=[\dmsg#\.\/]{1,40})?|action=profile;u=\d+)/,
+      eptQuotePattern = /^\/threads\/[a-z0-9\-]*\/posts[a-z0-9?\=\-#\&]*/i,
       tags,
       tagList,
       tagsNoParseList = [],
@@ -99,7 +102,77 @@ var XBBCODE = (function() {
    *    tag names, just make sure the tag name gets escaped properly (if needed).
    * --------------------------------------------------------------------------- */
 
+  // tags to add:
+  // img parameters
+  // list parameters
+  // chrissy (wtf)
+  // kissy (wtf)
+  // flash (not supported)
+
+  /* Allowed Color Codes: 
+   * red
+   * green
+   * blue
+   * orange
+   * yellow
+   * pink
+   * black
+   * white
+   * beige
+   * brown
+   * grey
+   * gray
+   * silver
+   * purple
+   * maroon
+   * lime
+   * limegreen
+   * olive
+   * navy
+   * teal
+   * aqua
+   */
+
+  /* hard coded colors: 
+   * Black
+   * Blue
+   * Green
+   * Red
+   * White
+   */
+
   tags = {
+    "anchor": {
+      openTag: function(params, content) {
+        var id = params || '';
+        id = id.substr(1) || '';
+        if ( !anchorPattern.test(id) ) { id = ''; }
+        return '<span id="post_' + id + '">';
+      },
+      closeTag: function(params, content) { return '</span>'; }
+    },
+    "abbr": {
+      openTag: function(params,content) {
+        var title = params || '';
+        title = title.substr(1) || '';
+        title = title.replace(/<.*?>/g,'');
+        return '<abbr title="' + title + '">';
+      },
+      closeTag: function(params,content) {
+          return '</abbr>';
+      }
+    },
+    "acronym": {
+      openTag: function(params,content) {
+        var title = params || '';
+        title = title.substr(1) || '';
+        itle = title.replace(/<.*?>/g,'');
+        return '<acronym title="' + title + '">';
+      },
+      closeTag: function(params,content) {
+          return '</acronym>';
+      }
+    },
     "b": {
       openTag: function(params,content) { return '<b>'; },
       closeTag: function(params,content) { return '</b>'; }
@@ -150,16 +223,19 @@ var XBBCODE = (function() {
     },
     "code": {
       openTag: function(params,content) {
-        return '<pre style="font-family: monospace;">';
+        return '<code>';
       },
       closeTag: function(params,content) {
-        return '</pre>';
+        return '</code>';
       },
       noParse: true
     },
     "color": {
       openTag: function(params,content) {
-        var colorCode = params.substr(1) || "black";
+        var colorCode = params || '=black';
+        colorCode = params.substr(1) || "black";
+        colorCode = colorCode.toLowerCase();
+        colorCode = colorCode.trim();
         colorNamePattern.lastIndex = 0;
         colorCodePattern.lastIndex = 0;
         if ( !colorNamePattern.test( colorCode ) ) {
@@ -182,12 +258,13 @@ var XBBCODE = (function() {
       openTag: function(params,content) {
         var myEmail;
         if (!params) {
-          myEmail = content.replace(/<.*?>/g,"");
+          myEmail = content.replace(/<.*?>/g,'');
         }
         else {
           myEmail = params.substr(1);
         }
 
+        myEmail = myEmail.trim();
         emailPattern.lastIndex = 0;
         if ( !emailPattern.test( myEmail ) ) {
           return '<a>';
@@ -203,12 +280,13 @@ var XBBCODE = (function() {
       openTag: function(params,content) {
         var thisFtp = "";
         if (!params) {
-          thisFtp = content.replace(/<.*?>/g,"");
+          thisFtp = content.replace(/<.*?>/g,'');
         }
         else {
           thisFtp = params.substr(1);
         }
 
+        thisFtp = thisFtp.trim();
         ftpPattern.lastIndex = 0;
         if ( !ftpPattern.test( thisFtp ) ) {
           return '<a target="_blank">';
@@ -219,11 +297,11 @@ var XBBCODE = (function() {
         return '</a>';
       }
     },
-    "face": {
+    "font": {
       openTag: function(params,content) {
-        // fix for no params
-        if (!params) params = "inherit";
-        var faceCode = params.substr(1) || "inherit";
+        var faceCode = params || '=inherit';
+        faceCode = params.substr(1);
+        faceCode = faceCode.trim();
         fontFacePattern.lastIndex = 0;
         if ( !fontFacePattern.test( faceCode ) ) {
           faceCode = "inherit";
@@ -232,16 +310,31 @@ var XBBCODE = (function() {
       },
       closeTag: function(params,content) { return '</span>'; }
     },
-    "font": {
-      openTag: function(params,content) {
-        var faceCode = params.substr(1) || "inherit";
-        fontFacePattern.lastIndex = 0;
-        if ( !fontFacePattern.test( faceCode ) ) {
-          faceCode = "inherit";
+    "glow": {
+      openTag: function(params, content) {
+        var options = params || '';
+        options = params.substr(1) || '';
+        options = options.replace(/<.*?>/g,'');
+
+        var color = options.split(',')[0];
+        color = color.trim();
+        color = color.toLowerCase();
+        colorNamePattern.lastIndex = 0;
+        colorCodePattern.lastIndex = 0;
+        if ( !colorNamePattern.test( color ) ) {
+          if ( !colorCodePattern.test( color ) ) {
+            color = "inherit";
+          }
+          else {
+            if (color.substr(0,1) !== "#") {
+              color = "#" + color;
+            }
+          }
         }
-        return '<span style="font-family:' + faceCode + '">';
+
+        return '<span style="background-color: ' + color + '">';
       },
-      closeTag: function(params,content) { return '</span>'; }
+      closeTag: function(params, content) { return '</span>'; }
     },
     "green": {
       openTag: function(params,content) {
@@ -266,6 +359,7 @@ var XBBCODE = (function() {
     "img": {
       openTag: function(params,content) {
         var myUrl = content;
+        myUrl = myUrl.trim();
         urlPattern.lastIndex = 0;
         if ( !urlPattern.test( myUrl ) ) {
             myUrl = "";
@@ -286,6 +380,7 @@ var XBBCODE = (function() {
           myUrl = params.substr(1);
         }
 
+        myUrl = myUrl.trim();
         urlPattern.lastIndex = 0;
         if ( !urlPattern.test( myUrl ) ) {
           myUrl = "#";
@@ -318,6 +413,21 @@ var XBBCODE = (function() {
       openTag: function(params,content) { return '<div dir="ltr">'; },
       closeTag: function(params,content) { return '</div>'; }
     },
+    "me": {
+      openTag: function(params, content) {
+        var name = params || '';
+        name = params.substr(1);
+        name = name.replace(/<.*?>/g,"");
+        name = name.trim();
+        if (content) { name = name + " "; }
+        return '<div style="color: red;">* ' + name + ' ';
+      },
+      closeTag: function(params, content) { return '</div>'; }
+    },
+    "move": {
+      openTag: function(params, content) { return '<div>'; },
+      closeTag: function(params, content) { return '</div>'; }
+    },
     "noparse": {
       openTag: function(params,content) { return ''; },
       closeTag: function(params,content) { return ''; },
@@ -343,8 +453,102 @@ var XBBCODE = (function() {
       noParse: true
     },
     "quote": {
-      openTag: function(params,content) { return '<blockquote>'; },
-      closeTag: function(params,content) { return '</blockquote>'; }
+      openTag: function(params,content) {
+        // default: no author, link or date
+        var quoteHeader = '<div class="quoteHeader">Quote</div>';
+        var quote = '<div class="quote">';
+
+        // clean params
+        var options = params || '';
+        options = options.trim();
+        options = options.replace(/<.*?>/g,'');
+        
+        // case 1: no params
+        if (options === '') { return quoteHeader + quote; }
+
+        // case 2: author from =params
+        if (options.indexOf('=') === 0) {
+          var equalsAuthor = options.substr(1);
+          quoteHeader = '<div class="quoteHeader">';
+          quoteHeader += 'Quote From: ' + equalsAuthor;
+          quoteHeader += '</div>';
+          return quoteHeader + quote;
+        }
+
+        // case 3: author="author"
+        if (/author="/i.test(options)) {
+          var refString = options.toLowerCase();
+          var quoteAuthor = options.substr(refString.indexOf('author="')+7);
+          quoteAuthor = quoteAuthor.replace(/"/g, '');
+          quoteHeader = '<div class="quoteHeader">';
+          quoteHeader += 'Quote From: ' + quoteAuthor;
+          quoteHeader += '</div>';
+          return quoteHeader + quote;
+        }
+
+        // case 4 & 5: parameters = author || author, link, and date
+        var author, link, date;
+
+        // validate that there is only one author, and optional link and date
+        var authorArray = /author=/i.exec(options);
+        if (!authorArray || authorArray.length > 2) {
+          return quoteHeader + quote;
+        }
+        var linkArray = /link=/i.exec(options);
+        if (linkArray && linkArray.length > 2) {
+          return quoteHeader + quote;
+        }
+        var timeArray = /date=/i.exec(options);
+        if (timeArray && timeArray.length > 2) {
+          return quoteHeader + quote;
+        }
+
+        // pull out parameters through regex
+        var regexArray = /^(author=.+?|link=.+?|date=[0-9]+?)?\s*(author=.+?|link=.+?|date=[0-9]+?)?\s*(author=.+?|link=.+?|date=[0-9]+?)$/i.exec(options);
+        
+        // check that array exists
+        if (regexArray) {
+          // parse author link date
+          // the regex array output is weird: 
+          // [0] = the matched output as a whole so skip that
+          for (var i = 1; i < regexArray.length; i++) {
+            var value = regexArray[i] || '';
+            value = value.trim();
+            if (/author=/i.test(value)) {
+              author = value.substr(7);
+            }
+            else if (/link=/i.test(value)) {
+              link = value.substr(5);
+              if (!smfQuotePattern.test(link) &&
+                  !eptQuotePattern.test(link)) {
+                link = undefined;
+              }
+            }
+            else if (/date=/i.test(value)) {
+              date= value.substr(5);
+            }
+          }
+        }
+
+        // author
+        if (author) {
+          quoteHeader = '<div class="quoteHeader">';
+          quoteHeader += 'Quote From: ' + author;
+          quoteHeader += '</div>';
+        }
+
+        // author link date
+        if (author && link && date) {
+          quoteHeader = '<div class="quoteHeader">';
+          quoteHeader += '<a href="' + link + '">';
+          quoteHeader += 'Quote from: ' + author + ' on ' + new Date(date);
+          quoteHeader += '</a>';
+          quoteHeader += '</div>';
+        }
+
+        return quoteHeader + quote;
+      },
+      closeTag: function(params,content) { return '</div>'; }
     },
     "right": {
       openTag: function(params,content) {
@@ -363,21 +567,96 @@ var XBBCODE = (function() {
       }
     },
     "rtl": {
-      openTag: function(params,content) {
-        return '<div dir="rtl">';
-      },
-      closeTag: function(params,content) {
-        return '</div>';
-      }
+      openTag: function(params,content) { return '<div dir="rtl">'; },
+      closeTag: function(params,content) { return '</div>'; }
     },
     "s": {
       openTag: function(params,content) { return '<del>'; },
       closeTag: function(params,content) { return '</del>'; }
     },
+    "shadow": {
+      openTag: function(params, content) {
+        var shadow = '';
+        var color = '';
+        var direction = '';
+        var blur = '';
+        var dirPattern = /^(?:left|right|top|bottom)$/;
+        var numberPattern = /^[0-9]\d{0,2}$/;
+
+        // params = color, direction, blur
+        var options = params || '';
+        options = params.substr(1) || '';
+        options = options.replace(/<.*?>/g,'');
+        if (options.indexOf(',') < 0) { return '<span>'; }
+
+        // color
+        color = options.split(',')[0];
+        color = color.trim();
+        color = color.toLowerCase();
+        colorNamePattern.lastIndex = 0;
+        colorCodePattern.lastIndex = 0;
+        if ( !colorNamePattern.test( color ) ) {
+          if ( !colorCodePattern.test( color ) ) {
+            color = "black";
+          }
+          else {
+            if (color.substr(0,1) !== "#") {
+              color = "#" + color;
+            }
+          }
+        }
+
+        // direction
+        direction = options.split(',')[1] || '';
+        direction = direction.trim();
+        // check if direction or angle
+        if (!direction) { direction = ' 0 0'; }
+        // direction
+        else if (dirPattern.test(direction)) {
+          // direction
+          if (direction === 'left') {
+            direction = ' -2px 2px';
+          }
+          else if (direction === 'right') {
+            direction = ' 2px 2px';
+          }
+          else if (direction === 'top') {
+            direction = ' 0 -2px';
+          }
+          else if (direction === 'bottom') {
+            direction = ' 0 2px';
+          }
+          else {
+            direction = ' 0 0';
+          }
+        }
+        // angle
+        else if (numberPattern.test(direction)) {
+          var angle = direction;
+          var radian = angle * 0.0174532925;
+          direction = ' ' + Math.round(4*Math.cos(radian)) + 'px';
+          direction += ' ' + Math.round(-4*Math.sin(radian)) + 'px';
+        }
+        else { direction = ' 0 0'; }
+
+        // blur
+        blur = options.split(',')[2] || '';
+        blur = blur.trim();
+        if (!blur) { blur = ' 0'; }
+        else if (numberPattern.test(blur)) { blur = ' ' + blur + 'px'; }
+        else { blur = ' 0'; }
+
+        // final output
+        shadow = color + direction + blur;
+        return '<span style="text-shadow: ' + shadow + '">';
+      },
+      closeTag: function(params, content) { return '</span>'; }
+    },
     "size": {
       openTag: function(params,content) {
-        params = params || '';
-        var size = params.substr(1) || "inherit";
+        var size = params || '';
+        size = size.substr(1) || "inherit";
+        size = size.trim();
         sizePattern.lastIndex = 0;
         if (!sizePattern.test(size)) {
           size = "inherit";
@@ -397,6 +676,20 @@ var XBBCODE = (function() {
     "tt": {
       openTag: function(params,content) { return '<tt>'; },
       closeTag: function(params,content) { return '</tt>'; }
+    },
+    "time": {
+      openTag: function(params, content) {
+        var date = content || '';
+        if (Number(date)) {
+          date = new Date(Number(date));
+        }
+        else {
+          date = new Date(date);
+        }
+        return date.toString();
+      },
+      closeTag: function(params, content) { return ''; },
+      displayContent: false
     },
     "table": {
       openTag: function(params,content) { return '<table>'; },
@@ -454,9 +747,10 @@ var XBBCODE = (function() {
       openTag: function(params,content) {
         var myUrl;
 
-        if (!params) {  myUrl = content.replace(/<.*?>/g,""); }
+        if (!params) {  myUrl = content.replace(/<.*?>/g,''); }
         else { myUrl = params.substr(1); }
 
+        myUrl = myUrl.trim();
         urlPattern.lastIndex = 0;
         if ( !urlPattern.test( myUrl ) ) {
           myUrl = "#";
