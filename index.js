@@ -104,7 +104,6 @@ var XBBCODE = (function() {
 
   // tags to add:
   // img parameters
-  // list parameters
   // chrissy (wtf)
   // kissy (wtf)
   // flash (not supported)
@@ -405,7 +404,29 @@ var XBBCODE = (function() {
       restrictParentsTo: ["list","ul","ol"]
     },
     "list": {
-      openTag: function(params,content) { return '<ul>'; },
+      openTag: function(params,content) {
+        var tag = '<ul>';
+        
+        // clean input
+        var type = params || '';
+        type = type.trim();
+        type = type.replace(/<.*?>/g,'');
+
+        // check for type= param
+        if (type.indexOf('type=') === 0) {
+
+          // parse type
+          type = type.replace('type=', '');
+          type = type.trim();
+
+          // check type validity
+          if (/(none|disc|circle|square|decimal|decimal-leading-zero|lower-roman|upper-roman|lower-alpha|upper-alpha|lower-greek|lower-latin|upper-latin|hebrew|armenian|georgian|cjk-ideographic|hiragana|katakana|hiragana-iroha|katakana-iroha)/i.test(type)) {
+            tag = '<ul style="list-style-type: ' + type + '">';
+          }
+        }
+
+        return tag;
+      },
       closeTag: function(params,content) { return '</ul>'; },
       restrictChildrenTo: ["*", "li"]
     },
