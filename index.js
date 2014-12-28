@@ -591,7 +591,7 @@ var XBBCODE = (function() {
               }
             }
             else if (/date=/i.test(value)) {
-              date= value.substr(5);
+              date = Number(value.substr(5));
             }
           }
         }
