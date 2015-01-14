@@ -607,7 +607,7 @@ var XBBCODE = (function() {
         if (author && link && date) {
           quoteHeader = '<div class="quoteHeader">';
           quoteHeader += '<a href="' + link + '">';
-          quoteHeader += 'Quote from: ' + author + ' on ' + new Date(date);
+          quoteHeader += 'Quote from: ' + author + ' on ept-date=' + date;
           quoteHeader += '</a>';
           quoteHeader += '</div>';
         }
