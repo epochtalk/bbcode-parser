@@ -121,7 +121,7 @@ BBCode Tag|Parsed Result|Notes
 [url]{URL}[/url]|```<a href="{URL}" target="_blank"></a>```|{URL} is always link text
 [white][/white]|```<span class="bbcode-color-white" style="color: white;">```|
 
-[1]: Meant for urls that stay within the domain and thus will not open the link in another tab. 
+[1]: Meant for urls that stay within the domain and thus will not open the link in another tab.  
 [2]: _color and direction are required but blur is optional_.  {color} is treated the same way as in the [color]. {direction} can be represented as either 'left, right, top, bottom' or as a number. {blur} must be a number  
 [3]: {size} can be either an number followed by either px or pt. Or it can be one of the following: smaller, small, large, larger, x-large, x-larger  
 [4]: {time} can be either a number (milliseconds since epoch), or a datetime string that can be parsed by JavaScript's Date object.  
