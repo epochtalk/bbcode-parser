@@ -1,18 +1,15 @@
 {
-  "name": "bbcode-parser",
-  "version": "0.0.1",
-  "description": "BBCode parser for SMF based BBCode",
+  "name": "epochtalk-bbcode-parser",
+  "version": "1.0.0",
+  "description": "BBCode parser for Node written for Epochtalk. Based on SMF's flavor of BBCode.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com//epochtalk/bbcode-parser"
   },
   "keywords": [
-    "BBCode"
+    "bbcode"
   ],
-  "author": "Edward Kim",
-  "license": "MIT"
+  "author": "Edward Kim <ed@slickage.com>",
+  "license": "ISC"
 }
