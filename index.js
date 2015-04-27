@@ -107,7 +107,7 @@ var XBBCODE = (function() {
   // kissy (wtf)
   // flash (not supported)
 
-  /* Allowed Color Codes: 
+  /* Allowed Color Codes:
    * red
    * green
    * blue
@@ -131,7 +131,7 @@ var XBBCODE = (function() {
    * aqua
    */
 
-  /* hard coded colors: 
+  /* hard coded colors:
    * Black
    * Blue
    * Green
@@ -382,7 +382,7 @@ var XBBCODE = (function() {
         options = options.trim();
         options = options.replace(/<.*?>/g,'');
         var alt, width, height;
-        
+
         // validate params counts
         if ((options.match(/alt=/gi) || []).length > 1) {
           return '<img src="' + myUrl + '" />';
@@ -398,11 +398,11 @@ var XBBCODE = (function() {
 
         // pull out parameters through regex
         var regexArray = /^(alt=.+?|width=[0-9]+?|height=[0-9]+?)?\s*(alt=.+?|width=[0-9]+?|height=[0-9]+?)?\s*(alt=.+?|width=[0-9]+?|height=[0-9]+?)$/i.exec(options);
-        
+
         // check that array exists
         if (regexArray) {
           // parse author link date
-          // the regex array output is weird: 
+          // the regex array output is weird:
           // [0] = the matched output as a whole so skip that
           for (var i = 1; i < regexArray.length; i++) {
             var value = regexArray[i] || '';
@@ -467,7 +467,7 @@ var XBBCODE = (function() {
     "list": {
       openTag: function(params,content) {
         var tag = '<ul>';
-        
+
         // clean input
         var type = params || '';
         type = type.trim();
@@ -544,7 +544,7 @@ var XBBCODE = (function() {
         var options = params || '';
         options = options.trim();
         options = options.replace(/<.*?>/g,'');
-        
+
         // case 1: no params
         if (options === '') { return quoteHeader + quote; }
 
@@ -585,11 +585,11 @@ var XBBCODE = (function() {
 
         // pull out parameters through regex
         var regexArray = /^(author=.+?|link=.+?|date=[0-9]+?)?\s*(author=.+?|link=.+?|date=[0-9]+?)?\s*(author=.+?|link=.+?|date=[0-9]+?)$/i.exec(options);
-        
+
         // check that array exists
         if (regexArray) {
           // parse author link date
-          // the regex array output is weird: 
+          // the regex array output is weird:
           // [0] = the matched output as a whole so skip that
           for (var i = 1; i < regexArray.length; i++) {
             var value = regexArray[i] || '';
@@ -745,6 +745,10 @@ var XBBCODE = (function() {
         }
         return '<span class="bbcode-size-' + size + '" style="font-size: ' + size + ' !important; line-height: 1.3em;">';
       },
+      closeTag: function(params,content) { return '</span>'; }
+    },
+    "spoiler": {
+      openTag: function(params,content) { return '<span class="spoiler">'; },
       closeTag: function(params,content) { return '</span>'; }
     },
     "sub": {

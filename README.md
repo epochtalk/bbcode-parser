@@ -29,7 +29,7 @@ The final result being (after AngularJS compiles and parses this):
 <span ng-style="{ 'color': 'red' }" style="color:red">test</span>
 ```
 
-Special attention has been given to ensure that any input is properly escaped and sanitized by both the BBCode parser, then the style-fix directive, and finally by AngularJS (ng-style) itself before being shown to the user. 
+Special attention has been given to ensure that any input is properly escaped and sanitized by both the BBCode parser, then the style-fix directive, and finally by AngularJS (ng-style) itself before being shown to the user.
 
 ### Attention to Time:
 All time/date output has been modified so that the unix time is what is placed in the output. It has also been prefixed with 'ept-date=' so that the auto-date directive can find the time/date and display it as local time.
@@ -52,7 +52,7 @@ BBCode Tag|Notes
 ----------|-----
 [font][/font]|Won't even be parsed
 
-## Tags Supported: 
+## Tags Supported:
 BBCode Tag|Parsed Result|Notes
 ----------|-------------|-----
 [anchor={text}][/anchor]| ```<span id="post_{text}"><span>``` | _Anchor will appear as_ "post_{text}"
@@ -104,6 +104,7 @@ BBCode Tag|Parsed Result|Notes
 [s][/s]|```<del></del>```|
 [shadow={color},{direction},{blur}][/shadow]|```<span class="bbcode-shadow-{color}{direction}{blur}" style="text-shadow: {color}{direction}{blur}"></span>```| [2] check bottom of grid
 [size={size}][/size]|```<span class="bbcode-size-{size}" style="font-size:{size} !important; line-height: 1.3em;"></span>```| [3] check bottom of grid
+[spoiler][/spoiler]|```<span class="spoiler"></span>```|
 [sub][/sub]|```<sub></sub>```|
 [sup][/sup]|```<sup></sup>```|
 [tt][/tt]|```<tt></tt>```|
