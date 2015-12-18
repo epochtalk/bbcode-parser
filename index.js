@@ -232,7 +232,7 @@ var XBBCODE = (function() {
       openTag: function(params,content) {
         var simpleColor = '';
         var colorCode = params || '=black';
-        colorCode = params.substr(1) || "black";
+        colorCode = colorCode.substr(1) || "black";
         colorCode = colorCode.toLowerCase();
         colorCode = colorCode.trim();
         colorNamePattern.lastIndex = 0;
