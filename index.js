@@ -164,7 +164,7 @@ var XBBCODE = (function() {
       openTag: function(params,content) {
         var title = params || '';
         title = title.substr(1) || '';
-        itle = title.replace(/<.*?>/g,'');
+        title = title.replace(/<.*?>/g,'');
         return '<acronym title="' + title + '">';
       },
       closeTag: function(params,content) {
