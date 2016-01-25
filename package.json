@@ -1,6 +1,6 @@
 {
   "name": "epochtalk-bbcode-parser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BBCode parser for Node written for Epochtalk. Based on SMF's flavor of BBCode.",
   "main": "index.js",
   "repository": {
