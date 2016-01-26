@@ -498,7 +498,7 @@ var XBBCODE = (function() {
     "me": {
       openTag: function(params, content) {
         var name = params || '';
-        name = params.substr(1);
+        name = name.substr(1);
         name = name.replace(/<.*?>/g,"");
         name = name.trim();
         if (content) { name = name + " "; }
