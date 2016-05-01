@@ -1124,9 +1124,11 @@ var XBBCODE = (function() {
     ret.html = ret.html.replace("&#91;", "["); // put ['s back in
     ret.html = ret.html.replace("&#93;", "]"); // put ['s back in
 
-    ret.html = ret.html.replace(/&lt;/g, "<"); // unescape HTML tag brackets
-    ret.html = ret.html.replace(/&gt;/g, ">"); // unescape HTML tag brackets
-
+    if (!config.escapeHtml) {
+      ret.html = ret.html.replace(/&lt;/g, "<"); // unescape HTML tag brackets
+      ret.html = ret.html.replace(/&gt;/g, ">"); // unescape HTML tag brackets
+    }
+    
     ret.error = (errQueue.length === 0) ? false : true;
     ret.errorQueue = errQueue;
 
