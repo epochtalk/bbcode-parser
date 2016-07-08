@@ -1,6 +1,9 @@
 bbcode-parser
 =============
 
+# THIS REPO IS NOW DEPRECATED
+## This code will no longer be maintained
+
 Epochtalk BBCode Parser built specifically for Bitcointalk's BBCode (SMF Based)
 
 This is based on the work of:  
